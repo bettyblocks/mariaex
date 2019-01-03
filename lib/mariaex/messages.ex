@@ -128,6 +128,15 @@ defmodule Mariaex.Messages do
     _ 23
   end
 
+  defcoder :auth_switch do
+    plugin_name :string
+    data :string
+  end
+
+  defcoder :auth_switch_resp do
+    data :string_eof
+  end
+
   defcoder :old_password do
     password :string
   end
@@ -295,7 +304,7 @@ defmodule Mariaex.Messages do
   defp decode_msg(<< 0 :: 8, _ :: binary >> = body, _),                            do: __decode__(:ok_resp, body)
   defp decode_msg(<< 254 >> = _body, _),                                           do: :mysql_old_password
   defp decode_msg(<< 254 :: 8, _ :: binary >> = body, _) when byte_size(body) < 9, do: __decode__(:eof_resp, body)
-  defp decode_msg(<< 254 :: 8, rest :: binary >>, _),                              do: __decode__(:auth_switch, rest)
+  defp decode_msg(<< 254 :: 8, _ :: binary >> = body, :handshake_send),            do: __decode__(:auth_switch, body)
   defp decode_msg(<< _ :: binary >> = body, :text_rows),                           do: __decode__(:text_row, body)
   defp decode_msg(body, :column_count),                                            do: __decode__(:column_count, body)
   defp decode_msg(body, :column_definitions),                                      do: __decode__(:column_definition_41, body)

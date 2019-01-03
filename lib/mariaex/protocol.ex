@@ -207,6 +207,17 @@ defmodule Mariaex.Protocol do
         {:error, error}
     end
   end
+  defp handle_handshake(packet(seqnum: seqnum, msg: auth_switch(plugin_name: @mysql_native_password, data: scramble_code)), _, %{opts: opts} = s) do
+    scramble = case password = opts[:password] do
+      nil -> ""
+      ""  -> ""
+      _   -> password(@mysql_native_password, password, scramble_code)
+    end
+    msg = auth_switch_resp(data: scramble)
+
+    msg_send(msg, s, seqnum + 1)
+    handshake_recv(s, nil)
+  end
   defp handle_handshake(packet(seqnum: seqnum,
                                msg: handshake(capability_flags_1: flag1,
                                               capability_flags_2: flag2,
