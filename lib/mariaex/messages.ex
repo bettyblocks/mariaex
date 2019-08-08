@@ -309,6 +309,6 @@ defmodule Mariaex.Messages do
                           << contents :: size(length_nul_terminated)-binary, 0 :: 8 >> -> contents
                           contents -> contents
                         end
-    {String.strip(auth_plugin_data2, 0), next}
+    {String.trim(auth_plugin_data2, "0"), next}
   end
 end
